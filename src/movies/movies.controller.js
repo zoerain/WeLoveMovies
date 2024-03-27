@@ -2,23 +2,27 @@ const moviesService = require('./movies.service');
 const asyncErrorBoundary = require('../errors/asyncErrorBoundary');
 
 async function list(req, res, next) {
-    if (req.query && req.query.is_showing === true) {
+    if (req.query && req.query.is_showing === 'true') {
         res.json({ data: await moviesService.listCurrentlyShowing() });
     }
     res.json({ data: await moviesService.list() });
 };
 
 async function movieExists(req, res, next) {
-    const movie = moviesService.read(req.params.movieId);
+  try {
+    const movie = await moviesService.read(req.params.movieId); // Added await
     if (movie) {
-        res.locals.movie = movie;
-        return next();
+      res.locals.movie = movie;
+      return next();
     }
     next({
-        status: 404,
-        message: 'Movie cannot be found',
+      status: 404,
+      message: "Movie cannot be found",
     });
-};
+  } catch (error) {
+    next(error); 
+  }
+}
 
 async function read(req, res, next) {
     const movieId = res.locals.movie.movie_id;
