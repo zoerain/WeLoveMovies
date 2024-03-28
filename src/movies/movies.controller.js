@@ -9,20 +9,16 @@ async function list(req, res, next) {
 };
 
 async function movieExists(req, res, next) {
-  try {
-    const movie = await moviesService.read(req.params.movieId); // Added await
+    const movie = await moviesService.read(req.params.movieId);
     if (movie) {
       res.locals.movie = movie;
       return next();
-    }
-    next({
+    };
+    return next({
       status: 404,
       message: "Movie cannot be found",
     });
-  } catch (error) {
-    next(error); 
-  }
-}
+};
 
 async function read(req, res, next) {
     const movieId = res.locals.movie.movie_id;
